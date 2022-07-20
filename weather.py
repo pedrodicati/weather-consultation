@@ -1,19 +1,26 @@
 import requests
 
-CHAVE = "c44c583615bd2805ebd575b615fd2e86"
+# entre no site e pegue sua chave própria
+# https://openweathermap.org
+
+KEY = "********************************" 
 URL = "http://api.openweathermap.org/data/2.5/weather"
 
-CIDADE = str(input("Digite a cidade do Brasil: "))
-PAIS = "br"
+CITY = str(input("Digite a cidade: "))
 
-requisicao = requests.get(URL, params={"q": f"{CIDADE},{PAIS}",
-                                      "appid": CHAVE,
-                                      "units": "metric",
-                                      "lang": "pt_br"})
+request = requests.get(URL, params={"q": CITY,          # cidade em que quer consultar a previsão
+                                    "appid": KEY,       # chave de acesso à API
+                                    "units": "metric",  # pega os dados em celsius
+                                    "lang": "pt_br"})   # traz em pt-br os dados
 
-if(requisicao.status_code == 200):
-    clima = requisicao.json() # transforma a requisição em um dicionário
-    name = clima['name']
-    temperatura = clima['main']['temp']
-    descricao = clima['weather'][0]['description']
-    print(name, temperatura, descricao)
+if (request.status_code == 200): # codigo 200 significa que a solicitação deu certo 
+    
+    weather = request.json() # transforma a requisição em um dicionário
+    
+    name        = weather['name']
+    temperature = weather['main']['temp']
+    description = weather['weather'][0]['description']
+    
+    print(f"\nCidade: {name}\nTemperatura: {temperature}\nDescrição: {description}")
+else:
+    print(f"\nErro: {request.status_code}")
