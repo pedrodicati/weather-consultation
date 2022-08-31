@@ -3,7 +3,7 @@ import requests
 # entre no site e pegue sua chave própria
 # https://openweathermap.org
 
-KEY = "c44c583615bd2805ebd575b615fd2e86" 
+KEY = open("key.txt", "r").read()
 URL = "http://api.openweathermap.org/data/2.5/weather"
 
 CITY = str(input("Digite a cidade: "))
