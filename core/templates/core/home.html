@@ -1,0 +1,61 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Consulta do Tempo - Weather App{% endblock %}
+
+{% block content %}
+    <h2>Consulta do Tempo</h2>
+
+    <form method="post" action="{% url 'home' %}">
+        {% csrf_token %}
+        <input type="text" name="city_name" placeholder="Digite o nome da cidade" required
+               value="{{ request.session.last_searched_city | default:'' }}">
+        <button type="submit" name="search_city">Consultar</button>
+    </form>
+
+    {% if weather %}
+        <div style="margin-top: 20px; border: 1px solid #ccc; padding: 10px;">
+            <h3>Tempo em {{ weather.name }}</h3>
+            {% if weather.icon %}
+                {# A URL completa do ícone será algo como: http://openweathermap.org/img/wn/10d@2x.png #}
+                <img src="http://openweathermap.org/img/wn/{{ weather.icon }}.png" alt="Ícone do tempo">
+            {% endif %}
+            <p><strong>Temperatura:</strong> {{ weather.temperature }} °C</p>
+            <p><strong>Descrição:</strong> {{ weather.description|capfirst }}</p>
+
+            {% if user.is_authenticated %}
+                <form method="post" action="{% url 'home' %}" style="display: inline;">
+                    {% csrf_token %}
+                    <input type="hidden" name="city_name_to_add" value="{{ weather.name }}">
+                    {% if not current_city_is_favorite %}
+                        <button type="submit" name="add_favorite">Adicionar aos Favoritos</button>
+                    {% else %}
+                        <p><em>Esta cidade já está nos seus favoritos.</em></p>
+                    {% endif %}
+                </form>
+            {% endif %}
+        </div>
+    {% endif %}
+
+    {% if user.is_authenticated %}
+        <div style="margin-top: 30px;">
+            <h3>Suas Cidades Favoritas</h3>
+            {% if favorite_cities %}
+                <ul>
+                    {% for fav_city in favorite_cities %}
+                        <li>
+                            <a href="{% url 'home' %}?city={{ fav_city.name }}">{{ fav_city.name }}</a>
+                            <form method="post" action="{% url 'home' %}" style="display: inline; margin-left: 10px;">
+                                {% csrf_token %}
+                                <input type="hidden" name="city_id_to_remove" value="{{ fav_city.id }}">
+                                <button type="submit" name="remove_favorite" style="font-size: 0.8em; padding: 2px 5px;">Remover</button>
+                            </form>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>Você ainda não adicionou nenhuma cidade aos favoritos.</p>
+            {% endif %}
+        </div>
+    {% endif %}
+
+{% endblock %}
